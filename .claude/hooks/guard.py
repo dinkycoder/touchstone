@@ -6,8 +6,8 @@ cases live in tests/hooks/test_guard.py.
 
 False positives are acceptable; misses are not. So the checks match what a command names (a
 path, a host, a variable), not which program touches it, because any program can read a file.
-One consequence: a `git commit -m` message that mentions `.env` or the sealed set is blocked
-too. Commit with `-F <file>` instead; a message carve-out would let `-m "$(cat .env)"` through.
+The one carve-out is commit and PR text (see `without_messages`): it is removed before the
+checks only when the shell cannot expand it, so `-m "$(cat .env)"` is still blocked.
 
 This is a tripwire, not a sandbox: it only sees the command string. A script that reads .env
 itself, a path held in a variable, or a recursive search over the whole tree (`grep -r .`,
@@ -85,6 +85,66 @@ SHELL = re.compile(
 HARMLESS_REDIRECTS = re.compile(r"\d*>&\d+|\d*>\s*(?:/dev/null|\$null|nul)(?![\w/])")
 SEGMENT_SPLIT = re.compile(r"\|\||&&|[;|&\n(){}`]")
 
+# Commands that only store message text, and the flags (or stdin-file flags) that carry it.
+MESSAGE_COMMANDS: list[tuple[re.Pattern[str], set[str], re.Pattern[str]]] = [
+    (
+        re.compile(r"(?i)^(?:\w+=\S*\s+)*git(?:\s+-C\s+\S+)*\s+(?:commit|tag)\b"),
+        {"-m", "--message"},
+        re.compile(r"(?:^|\s)(?:-F\s*|--file[=\s]\s*)-(?=\s|$)"),
+    ),
+    (
+        re.compile(r"(?i)^(?:\w+=\S*\s+)*gh\s+(?:pr|issue|release)\s+"
+                   r"(?:create|edit|comment|review)\b"),
+        {"-t", "--title", "-b", "--body", "-n", "--notes"},
+        re.compile(r"(?:^|\s)(?:-F\s*|--(?:body|notes)-file[=\s]\s*)-(?=\s|$)"),
+    ),
+]
+# Message text the shell passes through unexpanded: single quotes; double quotes with no `$`,
+# backtick or backslash; a PowerShell @'...'@ here-string; bash's "$(cat <<'EOF' ... EOF)".
+LITERAL = (
+    r"@'\r?\n.*?\r?\n'@"
+    r"|\"\$\(cat <<-?\s*'(?P<delim>\w+)'\r?\n.*?\r?\n(?P=delim)\r?\n\)\""
+    r"|(?:'[^']*')+"
+    r"|\"[^\"$`\\]*\""
+)
+MESSAGE_ARG = re.compile(
+    rf"(?s)(?<!\S)(?P<flag>-[a-z]|--[a-z]+)(?:=|\s+)?(?P<text>{LITERAL})(?=\s|$|[;&|)])"
+)
+# A heredoc with a quoted delimiter is literal too; its body goes to the command's stdin.
+QUOTED_HEREDOC = re.compile(
+    r"(?sm)<<-?\s*(['\"])(?P<delim>\w+)\1[^\n]*\n(?P<body>.*?)^\t*(?P=delim)$"
+)
+
+
+def owner(prefix: str) -> str:
+    """The simple command that the text just after `prefix` belongs to."""
+    code = re.sub(r"'[^']*'", "''", prefix)
+    code = re.sub(r'"[^"]*"', '""', code)
+    return SEGMENT_SPLIT.split(code)[-1].strip()
+
+
+def without_messages(command: str) -> str:
+    """`command` with literal commit/PR message text blanked, so a message that mentions a
+    guarded path or word isn't mistaken for touching it. Anything expandable stays."""
+    out, last = [], 0
+    for match in MESSAGE_ARG.finditer(command):
+        segment = owner(command[: match.start()])
+        if any(cmd.match(segment) and match["flag"] in flags
+               for cmd, flags, _ in MESSAGE_COMMANDS):
+            out += [command[last : match.start("text")], "''"]
+            last = match.end("text")
+    command = "".join(out) + command[last:]
+
+    out, last = [], 0
+    for match in QUOTED_HEREDOC.finditer(command):
+        line_start = command.rfind("\n", 0, match.start()) + 1
+        segment = owner(command[line_start : match.start()])
+        if any(cmd.match(segment) and stdin_flag.search(segment)
+               for cmd, _, stdin_flag in MESSAGE_COMMANDS):
+            out.append(command[last : match.start("body")])
+            last = match.end("body")
+    return "".join(out) + command[last:]
+
 
 def views(command: str) -> list[str]:
     """The command as written, plus forms with quoting and path noise removed, so that
@@ -117,6 +177,7 @@ def is_read_only(segment: str) -> bool:
 
 def check(command: str) -> str | None:
     """Return why `command` is blocked, or None to allow it."""
+    command = without_messages(command)
     forms = views(command)
     for pattern, reason in DENY_PATTERNS:
         if any(pattern.search(form) for form in forms):

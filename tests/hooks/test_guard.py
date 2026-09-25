@@ -106,6 +106,22 @@ BLOCKED: list[tuple[str, str]] = [
     ("Bash", "node -e \"require('child_process').execSync(Buffer.from(s, 'base64').toString())\""),
     ("PowerShell", "Invoke-Expression $cmd"),
     ("PowerShell", "powershell -EncodedCommand ZQBjAGgAbwA="),
+    # Commit and PR messages: only literal text is exempt, never anything the shell expands,
+    # and never the rest of the command line.
+    ("Bash", 'git commit -m "$(cat .env)"'),
+    ("Bash", 'git commit -m "`cat .env`"'),
+    ("Bash", "git commit -m 'x'\"$(cat .env)\""),
+    ("Bash", "git commit -m 'x' && cat .env"),
+    ("Bash", "git commit -m 'x'; cast chain-id --rpc-url https://mainnet.base.org"),
+    ("Bash", "git commit -m 'x' -- .env"),
+    ("Bash", "git commit -F - <<EOF\n$(cat .env)\nEOF"),
+    ("Bash", "git commit -F - <<'EOF'\nx\nEOF\ncat .env"),
+    ("Bash", "bash <<'EOF'\ncat .env\nEOF"),
+    ("Bash", "python -m 'deploy_mainnet'"),
+    ("Bash", 'gh pr create --body "$(cat .env)"'),
+    ("Bash", "gh pr create --body \"$(cat <<'EOF'\nx\nEOF\n); cat .env\""),
+    ("PowerShell", 'git commit -m "$(Get-Content .env)"'),
+    ("PowerShell", 'git commit -m @"\n$(Get-Content .env)\n"@'),
 ]
 
 # Ordinary development commands that must keep working.
@@ -132,6 +148,20 @@ ALLOWED: list[tuple[str, str]] = [
     ("Bash", "python -m services.ingest.sanctions diff --since last"),
     ("Bash", "git commit -m 'feat(ingest): add OFAC parser'"),
     ("Bash", "pip install -r requirements-dev.txt"),
+    # Literal commit and PR text may mention guarded words; it is stored, never run.
+    ("Bash", "git commit -m 'docs: the mainnet release is founder-only'"),
+    ("Bash", 'git commit -m "docs: record sealed eval probe"'),
+    ("Bash", "git commit -q -m 'docs: probe' -m 'Blocked: cat .env, cat ml/eval/sealed/x.csv.'"),
+    ("Bash", "git commit --message='fix: stop reading .env'"),
+    ("Bash", "git commit -q -F - <<'EOF'\ndocs(sprint): tick\n\nProbed .env, mainnet, sealed eval.\nEOF"),
+    (
+        "Bash",
+        "gh pr create --draft --title 'docs: mainnet notes' --body \"$(cat <<'EOF'\n"
+        "- cast chain-id --rpc-url https://mainnet.base.org: blocked\nEOF\n)\"",
+    ),
+    ("Bash", "gh pr edit 3 --body 'sealed eval read: blocked'"),
+    ("PowerShell", "git commit -m 'docs: probe .env'"),
+    ("PowerShell", "git commit -m @'\ndocs: probe .env and mainnet\n'@"),
     ("PowerShell", "Get-ChildItem"),
     ("PowerShell", "$env:PYTHONUTF8 = '1'; .venv/Scripts/python.exe -m pytest -q"),
 ]
