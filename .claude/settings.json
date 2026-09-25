@@ -1,0 +1,99 @@
+{
+  "env": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push -u origin HEAD)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr view *)",
+      "Bash(.venv/Scripts/python -m pytest *)",
+      "Bash(.venv/Scripts/python scripts/check_docs.py)",
+      "Bash(.venv/Scripts/python scripts/gen_readme.py)",
+      "PowerShell(git status)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)",
+      "PowerShell(git push -u origin HEAD)",
+      "PowerShell(gh pr create *)",
+      "PowerShell(gh pr edit *)",
+      "PowerShell(gh pr view *)",
+      "PowerShell(.venv/Scripts/python.exe -m pytest *)",
+      "PowerShell(.venv/Scripts/python.exe scripts/check_docs.py)",
+      "PowerShell(.venv/Scripts/python.exe scripts/gen_readme.py)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(gh pr merge *)",
+      "Bash(cast send *)",
+      "Bash(cast wallet *)",
+      "Bash(./scripts/release-mainnet.sh *)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./ml/eval/sealed/**)",
+      "Edit(./data/sanctions/raw/**)",
+      "Write(./data/sanctions/raw/**)",
+      "PowerShell(git push --force*)",
+      "PowerShell(git push -f*)",
+      "PowerShell(gh pr merge *)",
+      "PowerShell(cast send *)",
+      "PowerShell(cast wallet *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.venv/Scripts/python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.py"]
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.venv/Scripts/python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/bench_gate.py"]
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.venv/Scripts/python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/commit_checkpoint.py"]
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.venv/Scripts/python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/bench_gate.py"]
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.venv/Scripts/python.exe",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/commit_checkpoint.py"]
+          }
+        ]
+      }
+    ]
+  }
+}
