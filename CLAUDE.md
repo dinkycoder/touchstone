@@ -5,6 +5,8 @@ We sell screening DECISIONS + EVIDENCE, never legal conclusions.
 
 Full plan: [docs/plan/solo-build-plan.md](docs/plan/solo-build-plan.md) — read it, don't duplicate it here.
 Current sprint: [docs/sprint/CURRENT.md](docs/sprint/CURRENT.md).
+Book: [book/README.md](book/README.md) — Claude is lead writer; follow its workflow and rules. Part III
+chapters are drafted only after their sprint ships.
 
 ## Environment (this machine)
 - Windows 11, Python 3.12 via `py -3.12`, venv at `.venv`. Every `uv run X` in the plan doc means
