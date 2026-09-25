@@ -4,6 +4,8 @@ Pre-settlement counterparty-trust and sanctions oracle for AI-agent payments on 
 
 Full plan: [docs/plan/solo-build-plan.md](docs/plan/solo-build-plan.md)
 
+The book being written alongside the build: [book/README.md](book/README.md)
+
 ## Status
 
 <!-- docs-map:start:sprint-status -->
