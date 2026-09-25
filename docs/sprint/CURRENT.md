@@ -27,8 +27,10 @@ risk register and architecture note.
 - [x] `docs/docs-map.yml`, `scripts/check_docs.py`, `scripts/gen_readme.py`
 - [x] `.claude/skills/readme-sync/`, `.claude/skills/ship/`
 - [x] `.github/workflows/ci.yml` (pytest + `gen_readme.py --check` + check_docs)
-- [ ] Probe every guard once more from a live session with a command it should block (do this in `/hooks`
+- [x] Probe every guard once more from a live session with a command it should block (do this in `/hooks`
       and a real prompt, not just the pytest cases, before calling the sprint done)
+      — 2026-09-25: `.env` read (Bash + PowerShell), mainnet `cast`, sealed eval read and
+      `data/sanctions/raw` delete all blocked by `guard.py`; `git status` control allowed.
 
 ## Out of scope for Claude Code this sprint (founder-only — see CLAUDE.md "Stop-and-ask list")
 
