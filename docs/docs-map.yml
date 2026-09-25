@@ -1,0 +1,10 @@
+# docs/docs-map.yml — paths whose changes require these docs to change too.
+#
+# check_docs.py diffs the branch against origin/main; if a mapped path changed without its
+# doc(s) also changing, CI fails unless the PR is labeled "no-docs-needed".
+docs/sprint/CURRENT.md: [README.md]
+
+# Uncomment as these paths start to exist (Sprint 3+):
+# services/api/**: [README.md#api, services/api/README.md]
+# ml/matching/languages/**: [README.md#languages, ml/matching/languages/README.md]
+# contracts/**: [contracts/README.md]
