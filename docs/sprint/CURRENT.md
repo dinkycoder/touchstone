@@ -31,6 +31,8 @@ risk register and architecture note.
       and a real prompt, not just the pytest cases, before calling the sprint done)
       — 2026-09-25: `.env` read (Bash + PowerShell), mainnet `cast`, sealed eval read and
       `data/sanctions/raw` delete all blocked by `guard.py`; `git status` control allowed.
+      Stop hooks: `bench_gate.py` blocked a stop with a deliberately red test;
+      `commit_checkpoint.py` blocked a stop with green tests and an uncommitted scratch file.
 
 ## Out of scope for Claude Code this sprint (founder-only — see CLAUDE.md "Stop-and-ask list")
 
