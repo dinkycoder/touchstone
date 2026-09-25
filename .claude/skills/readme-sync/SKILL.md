@@ -1,6 +1,6 @@
 ---
 name: readme-sync
-description: Regenerate docs-map.yml-managed README blocks from their source of truth, then verify with check_docs.py. Use before finishing any task that touched a mapped source file (docs/sprint/CURRENT.md, or a future benchmark/endpoint manifest) or whenever check_docs.py flags drift.
+description: Regenerate docs-map.yml-managed README blocks from their source of truth, then verify with check_docs.py. Use before finishing any task that touched a generated block's source (docs/sprint/CURRENT.md frontmatter, or a future benchmark/endpoint manifest) or whenever `gen_readme.py --check` or check_docs.py flags drift.
 ---
 
 Run, in order, and report the output of each:

@@ -2,7 +2,10 @@
 #
 # check_docs.py diffs the branch against origin/main; if a mapped path changed without its
 # doc(s) also changing, CI fails unless the PR is labeled "no-docs-needed".
-docs/sprint/CURRENT.md: [README.md]
+#
+# Don't map a file to a README block generated from it (the docs-map:start/end regions). The
+# block only changes when the data it's built from changes, so any other edit to the source
+# would fail this check. CI runs `scripts/gen_readme.py --check` on generated blocks instead.
 
 # Uncomment as these paths start to exist (Sprint 3+):
 # services/api/**: [README.md#api, services/api/README.md]

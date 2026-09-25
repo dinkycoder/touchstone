@@ -26,7 +26,7 @@ risk register and architecture note.
 - [x] `tests/hooks/` — one blocked + one allowed case per guard
 - [x] `docs/docs-map.yml`, `scripts/check_docs.py`, `scripts/gen_readme.py`
 - [x] `.claude/skills/readme-sync/`, `.claude/skills/ship/`
-- [x] `.github/workflows/ci.yml` (pytest + check_docs)
+- [x] `.github/workflows/ci.yml` (pytest + `gen_readme.py --check` + check_docs)
 - [ ] Probe every guard once more from a live session with a command it should block (do this in `/hooks`
       and a real prompt, not just the pytest cases, before calling the sprint done)
 
@@ -44,7 +44,8 @@ risk register and architecture note.
 
 - `.venv/Scripts/python -m pytest -q` is green, including `tests/hooks/`.
 - `/hooks` lists `guard.py`, `bench_gate.py` and `commit_checkpoint.py` under the right events.
-- `.venv/Scripts/python scripts/check_docs.py` passes.
+- `.venv/Scripts/python scripts/gen_readme.py --check` and `.venv/Scripts/python scripts/check_docs.py`
+  pass.
 - Everything is committed on `chore/bootstrap` with a draft PR open against `main`.
 
 ## Next sprint preview (Wk 3-4, plan Section 12)

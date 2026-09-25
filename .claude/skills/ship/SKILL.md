@@ -6,8 +6,8 @@ description: Human-triggered pre-push checklist for TOUCHSTONE - tests, docs syn
 Run each step in order; stop and report if any step fails instead of continuing to the next one.
 
 1. `.venv/Scripts/python -m pytest -q`
-2. `.venv/Scripts/python scripts/check_docs.py` — if it fails, run the `readme-sync` skill first, then
-   re-run this step.
+2. `.venv/Scripts/python scripts/gen_readme.py --check` and `.venv/Scripts/python scripts/check_docs.py`
+   — if either fails, run the `readme-sync` skill first, then re-run this step.
 3. Confirm the current branch is not `main`/`master` (never commit there — `main` is also protected by a
    GitHub ruleset that would reject the push anyway).
 4. Review `git status` (never `git add -A`/`.` blindly), stage the relevant files, and commit with a

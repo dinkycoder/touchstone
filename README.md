@@ -19,5 +19,6 @@ See [docs/sprint/CURRENT.md](docs/sprint/CURRENT.md) for details. Don't hand-edi
 py -3.12 -m venv .venv
 .venv/Scripts/python -m pip install -r requirements-dev.txt
 .venv/Scripts/python -m pytest -q
+.venv/Scripts/python scripts/gen_readme.py --check
 .venv/Scripts/python scripts/check_docs.py
 ```

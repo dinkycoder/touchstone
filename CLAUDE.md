@@ -35,7 +35,7 @@ push.
 
 ## Commands
 - `.venv/Scripts/python -m pytest -q`
-- `.venv/Scripts/python scripts/check_docs.py` / `.venv/Scripts/python scripts/gen_readme.py`
+- `.venv/Scripts/python scripts/check_docs.py` / `.venv/Scripts/python scripts/gen_readme.py [--check]`
 - `.venv/Scripts/python -m ruff check --fix && .venv/Scripts/python -m ruff format` (once ruff is added)
 
 ## Non-negotiables (hooks enforce these; do not work around them)
@@ -49,7 +49,8 @@ push.
 - After each green test cycle: Conventional Commit (`feat(matcher-ar): …`, `fix(api): …`, `docs: …`), then
   `git push -u origin HEAD`.
 - First push of a task: `gh pr create --draft --fill`. Keep the PR checklist current.
-- If `scripts/check_docs.py` flags docs, run `/readme-sync` before finishing. Never type metrics into docs.
+- If `scripts/check_docs.py` or `scripts/gen_readme.py --check` flags docs, run `/readme-sync` before
+  finishing. Never type metrics into docs.
 - `/ship` (human-triggered) runs the full checklist and marks the PR ready for review. Claude never merges.
 
 ## Stop-and-ask list

@@ -36,12 +36,15 @@ def changed_files() -> set[str]:
 
 
 def has_bypass_label() -> bool:
-    result = subprocess.run(
-        ["gh", "pr", "view", "--json", "labels", "-q", ".labels[].name"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "view", "--json", "labels", "-q", ".labels[].name"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError:  # gh isn't installed, so there's no label to find
+        return False
     if result.returncode != 0:
         return False
     return BYPASS_LABEL in result.stdout.splitlines()
